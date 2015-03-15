@@ -1,0 +1,279 @@
+# Swagger API spec for Itinerary
+
+swagger: '2.0'
+info:
+    version: "1.0.0"
+    title: "Itinerary API"
+host: "localhost"
+basePath: /v1
+produces:
+    - application/json
+consumes:
+    - application/json
+
+paths:
+
+    /me:
+        get:
+            description: |
+                Gets `Self` object.
+            responses:
+                '200':
+                    description: Successful response
+                    schema:
+                        $ref: '#/definitions/Adventurer'
+                default:
+                    description: unexpected error
+                    schema:
+                        $ref: '#/definitions/errorModel'
+                    
+    /me/itineraries:
+        get:
+            description: |
+                Gets a a list of itineraries for the self user
+            parameters:
+                - name: page
+                  in: query
+                  description: The page offset
+                  type: integer
+                  format: int32
+            responses:
+                '200':
+                    desciption: Successful response
+                    schema:
+                        title: iteneraries
+                        type: array
+                        items:
+                            $ref: '#/definitions/Itinerary'
+                default:
+                    description: unexpected error
+                    schema:
+                        $ref: '#/definitions/errorModel'
+                        
+        post:
+            description: |
+                Creates a new `Itinerary`
+            parameters:
+                - name: itinerary
+                  in: body
+                  description: A new itinerary
+                  required: true
+                  schema:
+                    $ref: '#/definitions/NewItinerary'
+            responses:
+                '200':
+                    description: Sucessful response
+                    schema:
+                        $ref: '#/definitions/Itinerary'
+                default:
+                    description: unexpected error
+                    schema:
+                        $ref: '#/definitions/errorModel'
+                
+    /me/itineraries/{id}:
+        get:
+            description: | 
+                Gets an Itinerary by id
+            parameters:
+                - name: iid
+                  in: path
+                  description: The id of the Itinerary
+                  required: true
+                  type: integer
+                  format: int64
+            responses:
+                '200':
+                    desciption: Successful response
+                    schema:
+                        $ref: '#/definitions/Itinerary'
+                default:
+                    description: unexpected error
+                    schema:
+                        $ref: '#/definitions/errorModel'
+        
+        put:
+            description: |
+                Updates an Itinerary
+            parameters:
+                - name: iid
+                  in: path
+                  description: The id of the Itinerary
+                  required: true
+                  type: integer
+                  format: int64
+                - name: itinerary
+                  in: body
+                  description: The updated Itinerary
+                  required: true
+                  schema:
+                    $ref: '#/definitions/NewItinerary'
+            responses:
+                '200':
+                    desciption: Successful response
+                    schema:
+                        $ref: '#/definitions/Itinerary'
+                default:
+                    description: unexpected error
+                    schema:
+                        $ref: '#/definitions/errorModel'
+    
+    /me/intineraries/{iid}/stops/{sid}:
+        get:
+            description: |
+                Get a `Stop` from an `Itinerary`
+            parameters:
+                - name: iid
+                  in: path
+                  description: The id of the `Itinerary`
+                  required: true
+                  type: integer
+                  format: int64
+                - name: sid
+                  in: path
+                  description: The id of the `Stop`
+                  required: true
+                  type: integer
+                  format: int64
+            responses:
+                '200':
+                    description: Sucessful response
+                    schema:
+                        $ref: '#/definitions/Stop'
+                default:
+                    description: unexpected error
+                    schema:
+                        $ref: '#/definitions/errorModel'
+        
+        put:
+            description: |
+                Updates a `Stop` in an `Itinerary`
+            parameters:
+                - name: iid
+                  in: path
+                  description: The id of the `Itinerary`
+                  required: true
+                  type: integer
+                  format: int64
+                - name: sid
+                  in: path
+                  description: The id of the `Stop`
+                  required: true
+                  type: integer
+                  format: int66
+                - name: stop
+                  in: body
+                  description: The updated Stop
+                  schema:
+                    $ref: '#/definitions/NewStop'
+            responses:
+                '200':
+                    description: Sucessful response
+                    schema:
+                        $ref: '#/definitions/Stop'
+                default:
+                    description: unexpected error
+                    schema:
+                        $ref: '#/definitions/errorModel'
+                
+definitions:
+
+    NewItinerary:
+        description: A new travel Itinerary
+        required:
+            - name
+            - stops
+        properties:
+            name:
+                description: The name of the Itinerary
+                type: string
+            stops:
+                description: An array of Stops
+                type: array
+                items:
+                    $ref: '#/definitions/NewStop'
+
+    Itinerary:
+        description: A travel Itinerary
+        required:
+            - id
+            - stops
+        properties:
+            id:
+                description: the unique identifier of this Itinerary
+                type: integer
+                format: int64
+            name:
+                description: The name of the Itinerary
+                type: string
+            stops:
+                description: An array of Stops
+                type: array
+                items:
+                    $ref: '#/definitions/Stop'
+            cover-photo:
+                description: The cover image for this itinerary
+                type: string
+            created-at:
+                description: The time and date of creation
+                type: string
+                format: date-time
+                
+    NewStop:
+        description: A new `Stop` in an `Itinerary`
+        required:
+            - latitude
+            - longitude
+            - cover-photo
+        properties:
+            name:
+                description: The name of this stop
+                type: string
+            latitude:
+                description: The latitude geographical coordinate of this Stop
+                type: string
+            longitude:
+                description: The longitude geographical coordinate of this Stop
+                type: string
+            cover-photo:
+                description: Base64 Encoded image for this stop
+                type: string
+
+    Stop:
+        description: A stop in an Itinerary
+        properties:
+            id:
+                description: the unique identifier of this Stop
+                type: integer
+                format: int64
+            latitude:
+                description: The latitude geographical coordinate of this Stop
+                type: string
+            longitude:
+                description: The longitude geographical coordinate of this Stop
+                type: string
+            created-at:
+                description: The time of creation of this stop
+                type: string
+                format: date-time
+            cover-photo:
+                description: The cover photo for this stop
+                type: string
+
+    Adventurer:
+        description: A user of the Initinary app
+        properties:
+            name:
+                description: The name of the Adventurer
+                type: string
+            id:
+                description: The unique indetifier for this adventurer
+                type: integer
+                format: int64
+            itineraries:
+                description: An array of the last 5 itineraries of this user
+                type: array
+                items:
+                    $ref: '#/definitions/Itinerary'
+            avatar:
+                description: The photo avatar of this adventurer
+                type: string
